@@ -63,7 +63,6 @@ def main():
     for season in years:
         results.append(scrape_year(season))
     plot_year(results)
-    # plot_year(results)
 
 
 
