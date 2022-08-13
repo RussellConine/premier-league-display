@@ -3,6 +3,7 @@ from numpy import zeros
 import requests
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.animation import FuncAnimation
 
 # define website, leagues
 #https://www.worldfootball.net/history/eng-premier-league/
@@ -10,6 +11,8 @@ import pandas as pd
 first_year = 1888
 last_year = 2021
 base_url = "https://www.worldfootball.net/schedule/eng-premier-league-"
+graph_df = pd.DataFrame()
+
 
 def CreateYears(first_year,last_year):
     years = []
@@ -39,7 +42,7 @@ def ScrapeYear(year_string):
     return(teams)   
     
 
-def PlotYear(results):
+def PlotYear(results):  
     for count,season in enumerate(results):
         ys = list(range(len(season),0,-1))
         xs = count+1+zeros(len(season))
@@ -69,13 +72,22 @@ def ConvertToDataFrame(results, years):
                 results_dict[team].append(0)    # if team wasn't in that season, record place as zero
     df = pd.DataFrame(data = results_dict)
     df.index = years # name index with years
-    print(df)
+    return(df)
+
+def animate(i, ax, df,years):
+    global graph_df
+    print(df.loc[years[i]])
+    graph_df = graph_df.append(df.loc[years[i]])
+
+    ax.clear()
+    for col in graph_df.columns:
+        ax.plot(graph_df.index, graph_df[col])
+    
 
 def main():
     first_year = 1888
     last_year = 1893
     years = CreateYears(first_year, last_year)
-    print(years)
     results = {}
     max_len = 0
     for season in years:
@@ -83,7 +95,10 @@ def main():
     # print(results)
     results_df = ConvertToDataFrame(results, years)
     # PlotYear(results)
-
+    fig, ax = plt.subplots()
+    print(results_df)
+    ani = FuncAnimation(fig, animate, frames=len(results), interval=500, repeat=False, fargs=(ax,results_df,years))
+    plt.show()
 
 
 if __name__ == "__main__":
