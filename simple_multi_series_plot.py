@@ -26,5 +26,4 @@ def animate(i):
 
 ani = FuncAnimation(fig, animate, frames=len(df.index), interval=500, repeat=False)
 
-# plt.legend()
 plt.show()
